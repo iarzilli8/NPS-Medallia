@@ -13,84 +13,99 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
+    <!-- BANNER PRINCIPAL -->
     <div class="bg-blue-900 text-white p-8 pb-12 shadow-md">
         <div class="max-w-6xl mx-auto">
             <p class="text-xs font-mono uppercase tracking-widest opacity-60">Backoffice • Triage de encuestas</p>
             <h1 class="text-4xl font-bold mt-1">Clasificador de contactos NPS</h1>
-            <p class="text-sm mt-2 opacity-80">Cargá el archivo de Medallia (Excel/CSV), automatizá la clasificación en categorías y analizá la distribución del score general.</p>
+            <p class="text-sm mt-2 opacity-80">Automatización del etiquetado Medallia clonando el criterio histórico del analista mediante Few-Shot Learning.</p>
         </div>
     </div>
 
     <div class="max-w-6xl mx-auto -mt-6 px-4 pb-12">
+        <!-- BOTONES DE NAVEGACIÓN (TABS) -->
         <div class="flex gap-2 mb-6">
             <button id="btn-nuevo" onclick="switchTab('nuevo')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active">
-                Carga de Archivo
+                Entrenamiento y Carga
             </button>
             <button id="btn-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive">
                 Dashboard
             </button>
         </div>
 
+        <!-- ================= VISTA 1: CARGA Y ENTRENAMIENTO ================= -->
         <div id="vista-nuevo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <!-- PANEL IZQUIERDO: CARGA DE MATRIZ HISTÓRICA Y ARCHIVO ACTUAL -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                
+                <!-- PASO 1: ENTRONIZAR HISTÓRICO (TU CRITERIO) -->
                 <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">AGENTE RESPONSABLE</h3>
-                    <input type="text" value="Tu Usuario Samsung" disabled class="border border-slate-200 bg-slate-50 rounded-lg px-3 py-1.5 w-full text-sm text-slate-400 font-mono" />
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">1. Matriz de Criterio Histórico (Entrenamiento)</label>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold font-mono">Few-Shot Context</span>
+                    </div>
+                    <div class="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 text-center relative hover:bg-slate-100/50 transition-colors">
+                        <input type="file" id="train-input" accept=".csv,.xlsx" onchange="actualizarEstadoTrain()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <p id="train-text" class="text-xs text-slate-600 font-medium">✨ Cargar base histórica con mi clasificación manual (.xlsx)</p>
+                    </div>
                 </div>
 
+                <!-- PASO 2: CARGA DEL NUEVO REPORTE -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">SELECCIONAR RAWDATA (EXCEL / CSV)</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition-colors cursor-pointer relative">
-                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" onchange="mostrarArchivoCargado()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                        <p id="file-text" class="text-sm text-slate-500 font-medium">Arrastrá tu reporte de Medallia acá o hacé clic para explorar</p>
-                        <p class="text-xs text-slate-400 mt-1">Soporta formatos .xlsx, .xls y .csv extraídos directamente del hub</p>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Cargar RawData Actual de Medallia</label>
+                    <div class="border border-slate-300 rounded-lg p-4 text-center relative hover:bg-slate-50 transition-colors">
+                        <input type="file" id="file-input" accept=".csv,.xlsx" onchange="mostrarArchivoCargado()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <p id="file-text" class="text-xs text-slate-500">Seleccionar el reporte de la semana a procesar</p>
                     </div>
                 </div>
 
                 <button onclick="simularProcesamientoLote()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-3 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
-                    Procesar y Clasificar con IA (Batch Mode)
+                    Adaptar Criterio y Procesar Lote
                 </button>
 
-                <div class="pt-4 border-t border-slate-100 text-center">
+                <div class="pt-3 border-t border-slate-100 text-center">
                     <button onclick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
-                        💡 Inyectar simulación con datos de prueba de Samsung
+                        ⚡ Cargar simulación rápida (Histórico + Medallia)
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[360px] flex flex-col justify-between">
+            <!-- PANEL DERECHO: PIPELINE DE IA -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[380px] flex flex-col justify-between">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">ESTADO DEL PROCESAMIENTO</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">LOG DEL MODELO ADAPTATIVO</h3>
                     
                     <div id="status-inicial" class="text-sm text-slate-400 italic mt-8">
-                        Esperando la carga del archivo para iniciar el pipeline de IA Generativa.
+                        Esperando la carga del archivo histórico para clonar taxonomías del analista.
                     </div>
 
                     <div id="status-procesando" class="hidden space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-4 h-4 rounded-full border-2 border-blue-800 border-t-transparent animate-spin"></div>
-                            <p class="text-sm font-semibold text-slate-700">Analizando registros y leyendo comentarios...</p>
+                            <p class="text-sm font-semibold text-slate-700">Inyectando memoria de criterio...</p>
                         </div>
-                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-40 overflow-y-auto">
-                            Iniciando mapeo de Número de Compra...
+                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line">
+                            Iniciando...
                         </p>
                     </div>
 
                     <div id="status-completo" class="hidden space-y-3">
                         <div class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex flex-col gap-1 border border-emerald-100">
-                            <span class="font-bold">✓ ¡Pipeline Finalizado con Éxito!</span>
-                            <span>Se procesaron 4 registros de prueba estructurando N° de compra, Score NPS, Categoría (Main) y Falla Reducida (Specific).</span>
+                            <span class="font-bold">✓ Alineación de Modelo Exitosa</span>
+                            <span>La IA leyó las clasificaciones históricas y procesó la nueva RawData aplicando tus subcategorías estandarizadas de negocio.</span>
                         </div>
-                        <p class="text-xs text-slate-500">Pasá a la pestaña de <b>Dashboard</b> para ver los resultados agrupados y la tabla consolidada.</p>
+                        <p class="text-xs text-slate-500">Métricas consolidadas listas en la pestaña <b>Dashboard</b>.</p>
                     </div>
                 </div>
-                <div class="text-xs text-slate-400 border-t border-slate-100 pt-3">
-                    Herramienta simulada bajo lineamientos de la Diplomatura IA FCE-UBA.
+                <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-2 font-mono">
+                    Taxonomy alignment: 10 Main Categories / Estandard Specific Causes.
                 </div>
             </div>
         </div>
 
+        <!-- ================= VISTA 2: DASHBOARD ================= -->
         <div id="vista-dashboard" class="space-y-6 hidden">
+            <!-- RECONOCIMIENTO DE SEGMENTOS NPS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
                     <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Detractores (Scores 1-6)</span>
@@ -106,9 +121,10 @@
                 </div>
             </div>
 
+            <!-- TABLA COMPILADA CON PARÁMETROS REALES -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Compilado Consolidado & Clasificación de Issues</h3>
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Pivot Table & RawData - Alineación de Criterio Experto</h3>
                     <button class="bg-blue-800 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">Exportar Reporte (Excel)</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -118,13 +134,13 @@
                           <th class="p-3">N° Compra</th>
                           <th class="p-3 text-center">Score NPS</th>
                           <th class="p-3">Comentario Original de Medallia</th>
-                          <th class="p-3">Main Issue (IA)</th>
-                          <th class="p-3">Specific Cause (Reducida)</th>
+                          <th class="p-3">Main Issue (Tu Criterio)</th>
+                          <th class="p-3">Specific Cause (Taxonomía Clonada)</th>
                         </tr>
                       </thead>
                       <tbody id="tabla-cuerpo" class="divide-y divide-slate-100 text-slate-600">
                         <tr>
-                          <td colSpan="5" class="p-6 text-center text-slate-400 italic text-sm">No hay registros procesados. Cargá un archivo en la sección anterior.</td>
+                          <td colSpan="5" class="p-6 text-center text-slate-400 italic text-sm">No hay registros alineados. Completá la carga en la sección de Entrenamiento.</td>
                         </tr>
                       </tbody>
                     </table>
@@ -133,13 +149,17 @@
         </div>
     </div>
 
+    <!-- LÓGICA DE AUTOMATIZACIÓN -->
     <script>
-        // Data Base de Simulación con los requerimientos exactos de Samsung
+        // Nueva matriz de simulación con las causas específicas estructuradas que querías
         const MOCK_DATA = [
-            { compra: "40098231", score: 2, comentario: "Compré un Galaxy S24 Ultra y la batería no dura ni 6 horas en uso normal. Decepción absoluta.", main: "Product", specific: "Product issue" },
-            { compra: "40098540", score: 3, comentario: "La app de Samsung se cuelga cuando intento ver el estado de mi envío, tuve que usar la computadora.", main: "Samsung APP", specific: "Samsung APP issue" },
-            { compra: "40097112", score: 8, comentario: "El televisor llegó bien, pero la instalación tardó dos días más de lo prometido.", main: "Delivery", specific: "Delivery issue" },
-            { compra: "40099001", score: 10, comentario: "Excelente atención en la preventa, el cupón de descuento funcionó impecable.", main: "Purchase Experience", specific: "Purchase Experience issue" }
+            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65. Iniciando reclamo.", main: "DOA/DAP Process", specific: "wrong model delivered" },
+            { compra: "45087311", score: 3, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
+            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45081192", score: 5, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
+            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil.", main: "Pickup", specific: "store pickup standard" },
+            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
         ];
 
         function switchTab(tab) {
@@ -161,24 +181,25 @@
             }
         }
 
+        function actualizarEstadoTrain() {
+            document.getElementById('train-text').innerText = "✅ Matriz de Criterio Histórico Cargada (3,400 filas)";
+            document.getElementById('train-text').className = "text-xs text-emerald-700 font-bold";
+        }
+
         function mostrarArchivoCargado() {
-            const input = document.getElementById('file-input');
-            const text = document.getElementById('file-text');
-            if(input.files.length > 0) {
-                text.innerText = `📄 Archivo seleccionado: ${input.files[0].name}`;
-                text.className = "text-sm text-blue-800 font-bold";
-            }
+            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
         }
 
         function cargarSimulacionRapida() {
-            document.getElementById('file-text').innerText = "📄 Archivo: Medallia_NPS_RawData_Samsung.xlsx";
-            document.getElementById('file-text').className = "text-sm text-blue-800 font-bold";
+            actualizarEstadoTrain();
+            mostrarArchivoCargado();
         }
 
         function simularProcesamientoLote() {
-            const text = document.getElementById('file-text').innerText;
-            if(text.includes("Arrastrá")) {
-                alert("Por favor, cargá un archivo o inyectá la simulación de prueba para empezar.");
+            const fileCheck = document.getElementById('file-text').innerText;
+            if(fileCheck.includes("Seleccionar")) {
+                alert("Por favor, cargá los archivos o usá el botón de simulación rápida.");
                 return;
             }
 
@@ -187,47 +208,39 @@
             document.getElementById('status-procesando').classList.remove('hidden');
 
             const log = document.getElementById('log-ia');
-            log.innerHTML = "Iniciando lectura de registros...<br>";
+            log.innerHTML = "Mapeando matriz histórica del analista...<br>";
 
             setTimeout(() => {
-                log.innerHTML += "» Evaluando scores según rangos de Medallia...<br>";
+                log.innerHTML += "» Aprendiendo mapeos de subcategorías del usuario...<br>";
+                log.innerHTML += "» Clases detectadas: 'delay on delivery', 'lack of tracking information'...<br>";
             }, 800);
 
             setTimeout(() => {
-                log.innerHTML += "» Corriendo modelo de clasificación de lenguaje sobre 10 categorías oficiales...<br>";
-                log.innerHTML += "» Mapeando taxonomías: 'Product issue', 'Samsung APP issue'...<br>";
-            }, 1800);
+                log.innerHTML += "» Procesando RawData actual con el criterio clonado (Few-Shot Prompting)...<br>";
+            }, 1600);
 
             setTimeout(() => {
-                log.innerHTML += "» Enlazando números de compra de RawData corporativo...<br>";
-                log.innerHTML += "✓ Registros guardados de manera estructurada.";
-                
-                // Renderizar tabla y KPIs en background
+                log.innerHTML += "✓ Triage completado. Clasificación consistente con tus años de experiencia.<br>";
                 construirDashboard();
-                
                 document.getElementById('status-procesando').classList.add('hidden');
                 document.getElementById('status-completo').classList.remove('hidden');
-            }, 3000);
+            }, 2600);
         }
 
         function construirDashboard() {
-            let detractores = 0;
-            let neutrales = 0;
-            let promotores = 0;
+            let detractores = 0; let neutrales = 0; let promotores = 0;
             let tablaHtml = "";
 
             MOCK_DATA.forEach(row => {
-                // Lógica de Notas NPS Solicitada
                 if (row.score >= 1 && row.score <= 6) detractores++;
                 else if (row.score >= 7 && row.score <= 8) neutrales++;
                 else if (row.score >= 9 && row.score <= 10) promotores++;
 
-                // Color dinámico según la criticidad
                 let badgeStyle = "bg-slate-100 border-slate-300 text-slate-700";
-                if(row.main === "Product") badgeStyle = "bg-red-50 border-red-200 text-red-700";
-                if(row.main === "Samsung APP") badgeStyle = "bg-purple-50 border-purple-200 text-purple-700";
-                if(row.main === "Delivery") badgeStyle = "bg-amber-50 border-amber-200 text-amber-700";
-                if(row.main === "Purchase Experience") badgeStyle = "bg-emerald-50 border-emerald-200 text-emerald-700";
+                if(row.main === "Delivery" || row.main === "DOA/DAP Process") badgeStyle = "bg-red-50 border-red-200 text-red-700";
+                if(row.main === "Website" || row.main === "Samsung APP") badgeStyle = "bg-blue-50 border-blue-200 text-blue-700";
+                if(row.main === "Product") badgeStyle = "bg-purple-50 border-purple-200 text-purple-700";
+                if(row.main === "Payment") badgeStyle = "bg-amber-50 border-amber-200 text-amber-700";
 
                 tablaHtml += `
                     <tr class="hover:bg-slate-50/60 transition-colors">
@@ -235,7 +248,7 @@
                       <td class="p-3 font-bold text-slate-800 text-center w-24">${row.score}</td>
                       <td class="p-3 italic text-xs">"${row.comentario}"</td>
                       <td class="p-3"><span class="border px-2 py-0.5 rounded text-xs font-semibold ${badgeStyle}">${row.main}</span></td>
-                      <td class="p-3 text-xs font-medium text-slate-500">${row.specific}</td>
+                      <td class="p-3 text-xs font-mono text-slate-500">${row.specific}</td>
                     </tr>
                 `;
             });
