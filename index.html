@@ -93,4 +93,123 @@
         <div id="vista-dashboard" class="space-y-6 hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
-                    <span class="text-xs
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Detractores (Scores 1-6)</span>
+                    <span id="dash-detractores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Neutrales (Scores 7-8)</span>
+                    <span id="dash-neutrales" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Promotores (Scores 9-10)</span>
+                    <span id="dash-promotores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">🎯 Top 5 Principales Motivos de Detracción (Accionables)</h3>
+                    <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded font-mono">Segmento Detractor - Volumen de Incidencias</span>
+                </div>
+                
+                <div id="top-motivos-container" class="space-y-4">
+                    <p class="text-sm text-slate-400 italic text-center py-2">No hay datos procesados para generar el ranking de detractores.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Pivot Table & RawData - Alineación de Criterio Experto</h3>
+                    <button class="bg-blue-800 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">Exportar Reporte (Excel)</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                      <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                          <th class="p-3">N° Compra</th>
+                          <th class="p-3 text-center">Score NPS</th>
+                          <th class="p-3">Comentario Original de Medallia</th>
+                          <th class="p-3">Main Issue (Tu Criterio)</th>
+                          <th class="p-3">Specific Cause (Taxonomía Clonada)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tabla-cuerpo" class="divide-y divide-slate-100 text-slate-600">
+                        <tr>
+                          <td colSpan="5" class="p-6 text-center text-slate-400 italic text-sm">No hay registros alineados. Completá la carga en la sección de Entrenamiento.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MOCK_DATA = [
+            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45088121", score: 1, comentario: "Sigo esperando mi heladera, el estado dice entregado pero acá no vino nadie.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45088122", score: 3, comentario: "Demasiada demora en el envío programado del Smart TV.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45086551", score: 2, comentario: "La pasarela de pago rechazó mis 3 tarjetas válidas. Arreglen la web.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65.", main: "DOA/DAP Process", specific: "wrong model delivered" },
+            { compra: "45087311", score: 3, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
+            { compra: "45081192", score: 5, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
+            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil.", main: "Pickup", specific: "store pickup standard" },
+            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
+        ];
+
+        function switchTab(tab) {
+            const btnNuevo = document.getElementById('btn-nuevo');
+            const btnDashboard = document.getElementById('btn-dashboard');
+            const vistaNuevo = document.getElementById('vista-nuevo');
+            const vistaDashboard = document.getElementById('vista-dashboard');
+
+            if(tab === 'nuevo') {
+                btnNuevo.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active";
+                btnDashboard.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive";
+                vistaNuevo.classList.remove('hidden');
+                vistaDashboard.classList.add('hidden');
+            } else {
+                btnNuevo.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive";
+                btnDashboard.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active";
+                vistaNuevo.classList.add('hidden');
+                vistaDashboard.classList.remove('hidden');
+            }
+        }
+
+        function actualizarEstadoTrain() {
+            document.getElementById('train-text').innerText = "✅ Matriz de Criterio Histórico Cargada (3,400 filas)";
+            document.getElementById('train-text').className = "text-xs text-emerald-700 font-bold";
+        }
+
+        function mostrarArchivoCargado() {
+            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
+        }
+
+        function cargarSimulacionRapida() {
+            actualizarEstadoTrain();
+            mostrarArchivoCargado();
+        }
+
+        function simularProcesamientoLote() {
+            const fileCheck = document.getElementById('file-text').innerText;
+            if(fileCheck.includes("Seleccionar")) {
+                alert("Por favor, cargá los archivos o usá el botón de simulación rápida.");
+                return;
+            }
+
+            document.getElementById('status-inicial').classList.add('hidden');
+            document.getElementById('status-completo').classList.add('hidden');
+            document.getElementById('status-procesando').classList.remove('hidden');
+
+            const log = document.getElementById('log-ia');
+            log.innerHTML = "Mapeando matriz histórica del analista...<br>";
+
+            setTimeout(() => {
+                log.innerHTML += "» Aprendiendo mapeos de subcategorías del usuario...<br>";
+                log.innerHTML += "» Clases priorizadas del Top 5: 'delay on delivery', 'checkout gateway failure'...<br>";
+            }, 800);
+
+            setTimeout(() => {
+                log.innerHTML +=
