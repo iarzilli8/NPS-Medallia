@@ -35,10 +35,7 @@
 
         <!-- ================= VISTA 1: CARGA Y ENTRENAMIENTO ================= -->
         <div id="vista-nuevo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <!-- PANEL IZQUIERDO: CARGA DE MATRIZ HISTÓRICA Y ARCHIVO ACTUAL -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
-                
-                <!-- PASO 1: ENTRONIZAR HISTÓRICO (TU CRITERIO) -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">1. Matriz de Criterio Histórico (Entrenamiento)</label>
@@ -50,7 +47,6 @@
                     </div>
                 </div>
 
-                <!-- PASO 2: CARGA DEL NUEVO REPORTE -->
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Cargar RawData Actual de Medallia</label>
                     <div class="border border-slate-300 rounded-lg p-4 text-center relative hover:bg-slate-50 transition-colors">
@@ -60,35 +56,29 @@
                 </div>
 
                 <button onclick="simularProcesamientoLote()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-3 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
-                    Adaptar Criterio y Procesar Lote
+                    Adaptar Criterio y Processar Lote
                 </button>
 
                 <div class="pt-3 border-t border-slate-100 text-center">
-                    <button onclick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
+                    <button onClick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
                         ⚡ Cargar simulación rápida (Histórico + Medallia)
                     </button>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: PIPELINE DE IA -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[380px] flex flex-col justify-between">
                 <div>
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">LOG DEL MODELO ADAPTATIVO</h3>
-                    
                     <div id="status-inicial" class="text-sm text-slate-400 italic mt-8">
                         Esperando la carga del archivo histórico para clonar taxonomías del analista.
                     </div>
-
                     <div id="status-procesando" class="hidden space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-4 h-4 rounded-full border-2 border-blue-800 border-t-transparent animate-spin"></div>
                             <p class="text-sm font-semibold text-slate-700">Inyectando memoria de criterio...</p>
                         </div>
-                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line">
-                            Iniciando...
-                        </p>
+                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line">Iniciando...</p>
                     </div>
-
                     <div id="status-completo" class="hidden space-y-3">
                         <div class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex flex-col gap-1 border border-emerald-100">
                             <span class="font-bold">✓ Alineación de Modelo Exitosa</span>
@@ -118,6 +108,18 @@
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
                     <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Promotores (Scores 9-10)</span>
                     <span id="dash-promotores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
+                </div>
+            </div>
+
+            <!-- NUEVO COMPONENTE: TOP 5 MOTIVOS DE DETRACCIÓN -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">🎯 Top 5 Principales Motivos de Detracción (Accionables)</h3>
+                    <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded font-mono">Ordenado de Mayor a Menor</span>
+                </div>
+                
+                <div id="top-motivos-container" class="space-y-3">
+                    <p class="text-sm text-slate-400 italic text-center py-4">No hay datos procesados para generar el ranking.</p>
                 </div>
             </div>
 
@@ -151,12 +153,15 @@
 
     <!-- LÓGICA DE AUTOMATIZACIÓN -->
     <script>
-        // Nueva matriz de simulación con las causas específicas estructuradas que querías
+        // Ampliamos el pool de simulación para que el Top 5 tenga datos realistas y variados de mayor a menor volumen
         const MOCK_DATA = [
             { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
-            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65. Iniciando reclamo.", main: "DOA/DAP Process", specific: "wrong model delivered" },
-            { compra: "45087311", score: 3, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
+            { compra: "45088121", score: 1, comentario: "Sigo esperando mi heladera, el estado dice entregado pero acá no vino nadie.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45088122", score: 3, comentario: "Demasiada demora en el envío programado del Smart TV.", main: "Delivery", specific: "delay on delivery" },
             { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45086551", score: 2, comentario: "La pasarela de pago rechazó mis 3 tarjetas válidas. Arreglen la web.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65.", main: "DOA/DAP Process", specific: "wrong model delivered" },
+            { compra: "45087311", score: 3, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
             { compra: "45081192", score: 5, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
             { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil.", main: "Pickup", specific: "store pickup standard" },
             { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
@@ -212,7 +217,7 @@
 
             setTimeout(() => {
                 log.innerHTML += "» Aprendiendo mapeos de subcategorías del usuario...<br>";
-                log.innerHTML += "» Clases detectadas: 'delay on delivery', 'lack of tracking information'...<br>";
+                log.innerHTML += "» Clases detectadas y priorizadas: 'delay on delivery', 'checkout gateway failure'...<br>";
             }, 800);
 
             setTimeout(() => {
@@ -230,9 +235,15 @@
         function construirDashboard() {
             let detractores = 0; let neutrales = 0; let promotores = 0;
             let tablaHtml = "";
+            let conteoSpecifics = {};
 
             MOCK_DATA.forEach(row => {
-                if (row.score >= 1 && row.score <= 6) detractores++;
+                // Contadores NPS
+                if (row.score >= 1 && row.score <= 6) {
+                    detractores++;
+                    // Agrupar motivos específicos solo de los detractores para el Top 5 accionable
+                    conteoSpecifics[row.specific] = (conteoSpecifics[row.specific] || 0) + 1;
+                }
                 else if (row.score >= 7 && row.score <= 8) neutrales++;
                 else if (row.score >= 9 && row.score <= 10) promotores++;
 
@@ -253,9 +264,34 @@
                 `;
             });
 
+            // Generar y ordenar el Top 5 de mayor a menor volumen
+            const rankingOrdenado = Object.entries(conteoSpecifics)
+                .sort((a, b) => b[1] - a[1]) // Mayor a menor
+                .slice(0, 5);
+
+            let rankingHtml = "";
+            rankingOrdenado.forEach(([motivo, cantidad]) => {
+                // Calcular un porcentaje visual simple para la barra de progreso
+                const maxCantidad = rankingOrdenado[0][1];
+                const porcentajeBarra = (cantidad / maxCantidad) * 100;
+
+                rankingHtml += `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-medium text-slate-600">
+                            <span class="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded">${motivo}</span>
+                            <span class="font-bold text-red-600">${cantidad} casos</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: ${porcentajeBarra}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
             document.getElementById('dash-detractores').innerText = detractores;
             document.getElementById('dash-neutrales').innerText = neutrales;
             document.getElementById('dash-promotores').innerText = promotores;
+            document.getElementById('top-motivos-container').innerHTML = rankingHtml;
             document.getElementById('tabla-cuerpo').innerHTML = tablaHtml;
         }
     </script>
