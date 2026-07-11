@@ -13,7 +13,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-    <!-- BANNER PRINCIPAL -->
     <div class="bg-blue-900 text-white p-8 pb-12 shadow-md">
         <div class="max-w-6xl mx-auto">
             <p class="text-xs font-mono uppercase tracking-widest opacity-60">Backoffice • Triage de encuestas</p>
@@ -23,7 +22,6 @@
     </div>
 
     <div class="max-w-6xl mx-auto -mt-6 px-4 pb-12">
-        <!-- BOTONES DE NAVEGACIÓN (TABS) -->
         <div class="flex gap-2 mb-6">
             <button id="btn-nuevo" onclick="switchTab('nuevo')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active">
                 Entrenamiento y Carga
@@ -33,7 +31,6 @@
             </button>
         </div>
 
-        <!-- ================= VISTA 1: CARGA Y ENTRENAMIENTO ================= -->
         <div id="vista-nuevo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
                 <div>
@@ -56,11 +53,11 @@
                 </div>
 
                 <button onclick="simularProcesamientoLote()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-3 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
-                    Adaptar Criterio y Processar Lote
+                    Adaptar Criterio y Procesar Lote
                 </button>
 
                 <div class="pt-3 border-t border-slate-100 text-center">
-                    <button onClick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
+                    <button onclick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
                         ⚡ Cargar simulación rápida (Histórico + Medallia)
                     </button>
                 </div>
@@ -93,207 +90,7 @@
             </div>
         </div>
 
-        <!-- ================= VISTA 2: DASHBOARD ================= -->
         <div id="vista-dashboard" class="space-y-6 hidden">
-            <!-- RECONOCIMIENTO DE SEGMENTOS NPS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Detractores (Scores 1-6)</span>
-                    <span id="dash-detractores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Neutrales (Scores 7-8)</span>
-                    <span id="dash-neutrales" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Promotores (Scores 9-10)</span>
-                    <span id="dash-promotores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
-                </div>
-            </div>
-
-            <!-- NUEVO COMPONENTE: TOP 5 MOTIVOS DE DETRACCIÓN -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">🎯 Top 5 Principales Motivos de Detracción (Accionables)</h3>
-                    <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded font-mono">Ordenado de Mayor a Menor</span>
-                </div>
-                
-                <div id="top-motivos-container" class="space-y-3">
-                    <p class="text-sm text-slate-400 italic text-center py-4">No hay datos procesados para generar el ranking.</p>
-                </div>
-            </div>
-
-            <!-- TABLA COMPILADA CON PARÁMETROS REALES -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Pivot Table & RawData - Alineación de Criterio Experto</h3>
-                    <button class="bg-blue-800 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">Exportar Reporte (Excel)</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm border-collapse">
-                      <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                          <th class="p-3">N° Compra</th>
-                          <th class="p-3 text-center">Score NPS</th>
-                          <th class="p-3">Comentario Original de Medallia</th>
-                          <th class="p-3">Main Issue (Tu Criterio)</th>
-                          <th class="p-3">Specific Cause (Taxonomía Clonada)</th>
-                        </tr>
-                      </thead>
-                      <tbody id="tabla-cuerpo" class="divide-y divide-slate-100 text-slate-600">
-                        <tr>
-                          <td colSpan="5" class="p-6 text-center text-slate-400 italic text-sm">No hay registros alineados. Completá la carga en la sección de Entrenamiento.</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LÓGICA DE AUTOMATIZACIÓN -->
-    <script>
-        // Ampliamos el pool de simulación para que el Top 5 tenga datos realistas y variados de mayor a menor volumen
-        const MOCK_DATA = [
-            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
-            { compra: "45088121", score: 1, comentario: "Sigo esperando mi heladera, el estado dice entregado pero acá no vino nadie.", main: "Delivery", specific: "delay on delivery" },
-            { compra: "45088122", score: 3, comentario: "Demasiada demora en el envío programado del Smart TV.", main: "Delivery", specific: "delay on delivery" },
-            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
-            { compra: "45086551", score: 2, comentario: "La pasarela de pago rechazó mis 3 tarjetas válidas. Arreglen la web.", main: "Payment", specific: "checkout gateway failure" },
-            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65.", main: "DOA/DAP Process", specific: "wrong model delivered" },
-            { compra: "45087311", score: 3, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
-            { compra: "45081192", score: 5, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
-            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil.", main: "Pickup", specific: "store pickup standard" },
-            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
-        ];
-
-        function switchTab(tab) {
-            const btnNuevo = document.getElementById('btn-nuevo');
-            const btnDashboard = document.getElementById('btn-dashboard');
-            const vistaNuevo = document.getElementById('vista-nuevo');
-            const vistaDashboard = document.getElementById('vista-dashboard');
-
-            if(tab === 'nuevo') {
-                btnNuevo.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active";
-                btnDashboard.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive";
-                vistaNuevo.classList.remove('hidden');
-                vistaDashboard.classList.add('hidden');
-            } else {
-                btnNuevo.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive";
-                btnDashboard.className = "px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active";
-                vistaNuevo.classList.add('hidden');
-                vistaDashboard.classList.remove('hidden');
-            }
-        }
-
-        function actualizarEstadoTrain() {
-            document.getElementById('train-text').innerText = "✅ Matriz de Criterio Histórico Cargada (3,400 filas)";
-            document.getElementById('train-text').className = "text-xs text-emerald-700 font-bold";
-        }
-
-        function mostrarArchivoCargado() {
-            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
-            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
-        }
-
-        function cargarSimulacionRapida() {
-            actualizarEstadoTrain();
-            mostrarArchivoCargado();
-        }
-
-        function simularProcesamientoLote() {
-            const fileCheck = document.getElementById('file-text').innerText;
-            if(fileCheck.includes("Seleccionar")) {
-                alert("Por favor, cargá los archivos o usá el botón de simulación rápida.");
-                return;
-            }
-
-            document.getElementById('status-inicial').classList.add('hidden');
-            document.getElementById('status-completo').classList.add('hidden');
-            document.getElementById('status-procesando').classList.remove('hidden');
-
-            const log = document.getElementById('log-ia');
-            log.innerHTML = "Mapeando matriz histórica del analista...<br>";
-
-            setTimeout(() => {
-                log.innerHTML += "» Aprendiendo mapeos de subcategorías del usuario...<br>";
-                log.innerHTML += "» Clases detectadas y priorizadas: 'delay on delivery', 'checkout gateway failure'...<br>";
-            }, 800);
-
-            setTimeout(() => {
-                log.innerHTML += "» Procesando RawData actual con el criterio clonado (Few-Shot Prompting)...<br>";
-            }, 1600);
-
-            setTimeout(() => {
-                log.innerHTML += "✓ Triage completado. Clasificación consistente con tus años de experiencia.<br>";
-                construirDashboard();
-                document.getElementById('status-procesando').classList.add('hidden');
-                document.getElementById('status-completo').classList.remove('hidden');
-            }, 2600);
-        }
-
-        function construirDashboard() {
-            let detractores = 0; let neutrales = 0; let promotores = 0;
-            let tablaHtml = "";
-            let conteoSpecifics = {};
-
-            MOCK_DATA.forEach(row => {
-                // Contadores NPS
-                if (row.score >= 1 && row.score <= 6) {
-                    detractores++;
-                    // Agrupar motivos específicos solo de los detractores para el Top 5 accionable
-                    conteoSpecifics[row.specific] = (conteoSpecifics[row.specific] || 0) + 1;
-                }
-                else if (row.score >= 7 && row.score <= 8) neutrales++;
-                else if (row.score >= 9 && row.score <= 10) promotores++;
-
-                let badgeStyle = "bg-slate-100 border-slate-300 text-slate-700";
-                if(row.main === "Delivery" || row.main === "DOA/DAP Process") badgeStyle = "bg-red-50 border-red-200 text-red-700";
-                if(row.main === "Website" || row.main === "Samsung APP") badgeStyle = "bg-blue-50 border-blue-200 text-blue-700";
-                if(row.main === "Product") badgeStyle = "bg-purple-50 border-purple-200 text-purple-700";
-                if(row.main === "Payment") badgeStyle = "bg-amber-50 border-amber-200 text-amber-700";
-
-                tablaHtml += `
-                    <tr class="hover:bg-slate-50/60 transition-colors">
-                      <td class="p-3 font-mono font-bold text-xs text-slate-700">${row.compra}</td>
-                      <td class="p-3 font-bold text-slate-800 text-center w-24">${row.score}</td>
-                      <td class="p-3 italic text-xs">"${row.comentario}"</td>
-                      <td class="p-3"><span class="border px-2 py-0.5 rounded text-xs font-semibold ${badgeStyle}">${row.main}</span></td>
-                      <td class="p-3 text-xs font-mono text-slate-500">${row.specific}</td>
-                    </tr>
-                `;
-            });
-
-            // Generar y ordenar el Top 5 de mayor a menor volumen
-            const rankingOrdenado = Object.entries(conteoSpecifics)
-                .sort((a, b) => b[1] - a[1]) // Mayor a menor
-                .slice(0, 5);
-
-            let rankingHtml = "";
-            rankingOrdenado.forEach(([motivo, cantidad]) => {
-                // Calcular un porcentaje visual simple para la barra de progreso
-                const maxCantidad = rankingOrdenado[0][1];
-                const porcentajeBarra = (cantidad / maxCantidad) * 100;
-
-                rankingHtml += `
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-xs font-medium text-slate-600">
-                            <span class="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded">${motivo}</span>
-                            <span class="font-bold text-red-600">${cantidad} casos</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-red-500 h-2 rounded-full" style="width: ${porcentajeBarra}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            document.getElementById('dash-detractores').innerText = detractores;
-            document.getElementById('dash-neutrales').innerText = neutrales;
-            document.getElementById('dash-promotores').innerText = promotores;
-            document.getElementById('top-motivos-container').innerHTML = rankingHtml;
-            document.getElementById('tabla-cuerpo').innerHTML = tablaHtml;
-        }
-    </script>
-</body>
-</html>
+                    <span class="text-xs
