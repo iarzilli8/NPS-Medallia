@@ -74,7 +74,7 @@
                             <div class="w-4 h-4 rounded-full border-2 border-blue-800 border-t-transparent animate-spin"></div>
                             <p class="text-sm font-semibold text-slate-700">Inyectando memoria de criterio...</p>
                         </div>
-                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line">Iniciando...</p>
+                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line font-medium">Iniciando...</p>
                     </div>
                     <div id="status-completo" class="hidden space-y-3">
                         <div class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex flex-col gap-1 border border-emerald-100">
@@ -158,6 +158,9 @@
             { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
         ];
 
+        // Forzar estados de carga verdaderos para que no dependa solo del texto del botón redondeado
+        let csvCargado = false;
+
         function switchTab(tab) {
             const btnNuevo = document.getElementById('btn-nuevo');
             const btnDashboard = document.getElementById('btn-dashboard');
@@ -183,19 +186,27 @@
         }
 
         function mostrarArchivoCargado() {
-            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            const fileInput = document.getElementById('file-input');
+            if(fileInput.files.length > 0) {
+                document.getElementById('file-text').innerText = `📊 Archivo: ${fileInput.files[0].name}`;
+            } else {
+                document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            }
             document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
+            csvCargado = true; // Flag activado
         }
 
         function cargarSimulacionRapida() {
             actualizarEstadoTrain();
-            mostrarArchivoCargado();
+            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
+            csvCargado = true;
         }
 
         function simularProcesamientoLote() {
-            const fileCheck = document.getElementById('file-text').innerText;
-            if(fileCheck.includes("Seleccionar")) {
-                alert("Por favor, cargá los archivos o usá el botón de simulación rápida.");
+            // El botón ahora valida el flag directo de carga o simulación
+            if (!csvCargado) {
+                alert("Por favor, seleccioná tu archivo CSV/Excel de Medallia primero.");
                 return;
             }
 
@@ -212,4 +223,10 @@
             }, 800);
 
             setTimeout(() => {
-                log.innerHTML +=
+                log.innerHTML += "» Procesando RawData actual con el criterio clonado (Few-Shot Prompting)...<br>";
+            }, 1600);
+
+            setTimeout(() => {
+                log.innerHTML += "✓ Triage completado. Clasificación consistente con tus años de experiencia.<br>";
+                construirDashboard();
+                document.getElementById('status-procesando').classList.add('hidden');
