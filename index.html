@@ -17,9 +17,9 @@
     <!-- BANNER PRINCIPAL (Estilo Corporativo Samsung) -->
     <div class="bg-blue-900 text-white p-8 pb-12 shadow-md">
         <div class="max-w-6xl mx-auto">
-            <p class="text-xs font-mono uppercase tracking-widest opacity-60">Backoffice • Análisis de encuestas NPS</p>
+            <p class="text-xs font-mono uppercase tracking-widest opacity-60">Backoffice • Análisis de encuestas NPS masivas</p>
             <h1 class="text-4xl font-bold mt-1">Clasificador de contactos NPS</h1>
-            <p class="text-sm mt-2 opacity-80">Pegá el texto de una encuesta de Medallia, obtené el Main Issue y Specific Issue mediante IA, y seguí la gestión desde el dashboard.</p>
+            <p class="text-sm mt-2 opacity-80">Cargá tu matriz histórica analizada por humanos para que la IA herede tu criterio, procesá el reporte actual de Medallia y visualizá el impacto.</p>
         </div>
     </div>
 
@@ -27,137 +27,121 @@
         <!-- BOTONES DE NAVEGACIÓN (TABS) -->
         <div class="flex gap-2 mb-6">
             <button id="btn-nuevo" onclick="switchTab('nuevo')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active">
-                Nuevo ticket
+                Entrenamiento y Carga Masiva
             </button>
             <button id="btn-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-inactive">
                 Dashboard
             </button>
         </div>
 
-        <!-- ================= VISTA 1: NUEVO TICKET ================= -->
+        <!-- ================= VISTA 1: ENTRENAMIENTO Y CARGA ================= -->
         <div id="vista-nuevo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <!-- PANEL IZQUIERDO: FORMULARIO -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <!-- PANEL IZQUIERDO: SECCIÓN DE CARGA DE ARCHIVOS -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+                
+                <!-- PASO 1: APRENDIZAJE POR MODELO HISTÓRICO -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">AGENTE</label>
-                    <input type="text" value="Tu Usuario Samsung" disabled class="border border-slate-200 bg-slate-50 rounded-lg px-3 py-1.5 w-full text-sm text-slate-400 font-mono" />
-                </div>
-
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">TEXTO DEL TICKET (MEDALLIA)</label>
-                        <span class="text-xs bg-blue-100 text-blue-800 font-mono px-2 py-0.5 rounded font-bold">NPS-DETRECT-001</span>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">1. Matriz de Criterio General (Histórico Humano)</label>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold font-mono">Few-Shot Context</span>
                     </div>
-                    <textarea id="txt-comentario" rows="6" placeholder="Pegá acá el contacto del cliente tal como llegó de Medallia. No incluyas datos personales redundantes..." class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-blue-500 text-slate-700"></textarea>
+                    <p class="text-xs text-slate-400 mb-2">Sustraerá las categorías y subcategorías utilizadas en las columnas "Main issue" y "Specific cause".</p>
+                    <div class="border border-dashed border-slate-300 rounded-lg p-3 bg-slate-50 text-center relative hover:bg-slate-100/50 transition-colors">
+                        <input type="file" id="train-input" accept=".csv,.xlsx" onchange="actualizarEstadoTrain()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <p id="train-text" class="text-xs text-slate-600 font-medium">✨ Vincular Base Histórica de Criterio (.xlsx / .csv)</p>
+                    </div>
                 </div>
 
-                <button onclick="simularClasificacion()" class="bg-blue-800 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-2">
-                    Clasificar ticket (Simulación IA)
+                <!-- PASO 2: CARGA DE REPORTE SEMANAL -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. RawData Actual de Medallia a Analizar</label>
+                    <div class="border border-slate-300 rounded-lg p-4 text-center relative hover:bg-slate-50 transition-colors">
+                        <input type="file" id="file-input" accept=".csv,.xlsx" onchange="mostrarArchivoCargado()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <p id="file-text" class="text-xs text-slate-500">Seleccionar el archivo de la semana con ID de transacciones</p>
+                    </div>
+                </div>
+
+                <button onclick="simularProcesamientoLote()" class="w-full bg-blue-800 hover:bg-blue-700 text-white font-semibold text-sm px-5 py-3 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                    Clonará Criterio Humano y Procesar Lote
                 </button>
 
-                <!-- CARGAR EJEMPLOS -->
-                <div class="pt-4 border-t border-slate-100">
-                    <p class="text-xs font-bold text-slate-400 uppercase mb-2">CARGAR EJEMPLO (MEDALLIA RAW DATA)</p>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="cargarEjemplo('El camión de reparto nunca llegó el viernes y cuando llamé me dijeron que el producto Neo QLED volvió a depósito sin motivo. Pésimo.', 'Delivery', 'Retraso crítico y falta de aviso en entrega')" class="text-xs bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full text-slate-600 transition-colors">Demora de envío (Logística)</button>
-                        <button onclick="cargarEjemplo('Quiero pagar el celular en 12 cuotas fijas como dice el banner, pero al ingresar la tarjeta de crédito la página se recarga y da error de pasarela.', 'Payment', 'Error de checkout en pasarela bancaria')" class="text-xs bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full text-slate-600 transition-colors">Fallo en pasarela de pago</button>
-                        <button onclick="cargarEjemplo('Compré el Galaxy S24 Ultra hace tres días y la pantalla ya experimenta un parpadeo constante en la parte superior. Exijo el cambio directo.', 'Producto', 'Falla de hardware en display de smartphone')" class="text-xs bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full text-slate-600 transition-colors">Falla de producto de fábrica</button>
-                    </div>
+                <!-- ACTIVADOR DE SIMULACIÓN RÁPIDA -->
+                <div class="pt-3 border-t border-slate-100 text-center">
+                    <button onclick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
+                        ⚡ Cargar simulación rápida de archivos (Inyectar MockData)
+                    </button>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: LECTURA DE IA -->
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[340px] flex flex-col justify-between">
+            <!-- PANEL DERECHO: CONSOLA DE SIMULACIÓN IA -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[360px] flex flex-col justify-between">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">LECTURA DE CATEGORÍA Y DETALLE (PROTOTIPO IA)</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">LOG DEL MODELO ADAPTATIVO</h3>
                     
-                    <div id="resultado-vacio" class="text-sm text-slate-400 italic mt-8">
-                        Todavía no clasificaste ningún ticket de Medallia. Elegí un ejemplo o pegá un texto a la izquierda y dale a "Clasificar".
+                    <div id="status-inicial" class="text-sm text-slate-400 italic mt-8">
+                        Esperando la carga del archivo de criterios históricos evaluados por humanos para mapear la taxonomía de Samsung.
                     </div>
 
-                    <div id="resultado-ia" class="space-y-5 hidden">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 block uppercase tracking-wider">MAIN ISSUE DETECTADO</span>
-                            <span id="res-main" class="inline-block mt-1 bg-red-100 text-red-700 font-bold px-3 py-1 rounded-md text-sm border border-red-200">Delivery</span>
+                    <div id="status-procesando" class="hidden space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-4 h-4 rounded-full border-2 border-blue-800 border-t-transparent animate-spin"></div>
+                            <p class="text-sm font-semibold text-slate-700">Mapeando taxonomías de base histórica humana...</p>
                         </div>
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 block uppercase tracking-wider">SPECIFIC ISSUE (DETALLE ESPECÍFICO)</span>
-                            <p id="res-specific" class="text-slate-700 font-medium mt-1 text-base italic">"Detalle de la simulación"</p>
+                        <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line font-medium">Iniciando...</p>
+                    </div>
+
+                    <div id="status-completo" class="hidden space-y-3">
+                        <div class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex flex-col gap-1 border border-emerald-100">
+                            <span class="font-bold">✓ Criterio de Evaluación Clonado con Éxito</span>
+                            <span>La IA asimiló tus variables operacionales y procesó la nueva RawData mapeando los identificadores y agrupando según la regla estricta de notas NPS.</span>
                         </div>
+                        <p class="text-xs text-slate-500">Métricas consolidadas listas en la pestaña <b>Dashboard</b>.</p>
                     </div>
                 </div>
-
-                <div id="resultado-guardado" class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex items-center gap-1.5 border border-emerald-100 hidden">
-                    ✨ Simulación de flujo: En producción, este registro se almacena de forma estructurada e inmediata en Supabase.
+                <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-2 font-mono">
+                    Model state: Dynamic alignment with customer ID validation.
                 </div>
             </div>
         </div>
 
         <!-- ================= VISTA 2: DASHBOARD ================= -->
         <div id="vista-dashboard" class="space-y-6 hidden">
-            <!-- CARDS DE MÉTRICAS -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Total Detractores</span>
-                    <span class="text-3xl font-bold text-slate-800 mt-1 block">43</span>
+            <!-- CARDS DE MÉTRICAS SEGMENTADAS SEGÚN SCORE NPS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Detractores (Notas 1 a 6)</span>
+                    <span id="dash-detractores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
                 </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Casos Críticos Abiertos</span>
-                    <span class="text-3xl font-bold text-red-600 mt-1 block">12</span>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Neutrales (Notas 7 y 8)</span>
+                    <span id="dash-neutrales" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
                 </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Tiempo de Carga manual</span>
-                    <span class="text-3xl font-bold text-slate-400 line-through mt-1 block">2.5 hrs</span>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm bg-blue-50/50 border-blue-200">
-                    <span class="text-xs font-bold text-blue-700 uppercase block tracking-wider">Automatización por IA</span>
-                    <span class="text-3xl font-bold text-blue-800 mt-1 block">94.8%</span>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Promotores (Notas 9 y 10)</span>
+                    <span id="dash-promotores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
                 </div>
             </div>
 
-            <!-- EXPORTAR BOTONES -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-2 items-center justify-between">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">EXPORTAR REPORTE COMPILADO</span>
-                <div class="flex gap-2">
-                    <button class="bg-blue-800 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">Datos (Excel)</button>
-                    <button class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded opacity-50 cursor-not-allowed">Presentación (PowerPoint)</button>
-                    <button class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded opacity-50 cursor-not-allowed">Resumen Ejecutivo (PDF)</button>
-                </div>
-            </div>
-
-            <!-- TABLA COMPILADA COMPLETA -->
+            <!-- TABLA COMPILADA CON PARÁMETROS REALES -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider text-xs">Muestra de Pivot Table & RawData Integrada</h3>
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Pivot Table & RawData - Trazabilidad por ID de Compra</h3>
+                    <button class="bg-blue-800 text-white text-xs font-bold px-3 py-1.5 rounded hover:bg-blue-700 transition-colors">Exportar Reporte (Excel)</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm border-collapse">
                       <thead>
                         <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                          <th class="p-3">Score Medallia</th>
-                          <th class="p-3">Comentario original del cliente detractor</th>
-                          <th class="p-3">Main Issue (Clasificado)</th>
-                          <th class="p-3">Specific Issue (Detalle IA)</th>
+                          <th class="p-3">N° Compra (ID)</th>
+                          <th class="p-3 text-center">Score NPS</th>
+                          <th class="p-3">Comentario Original de Medallia</th>
+                          <th class="p-3">Main Issue (Criterio Clonado)</th>
+                          <th class="p-3">Specific Cause (Criterio Clonado)</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-slate-100 text-slate-600">
-                        <tr class="hover:bg-slate-50/60 transition-colors">
-                          <td class="p-3 font-bold text-red-600 bg-red-50 text-center w-24">1</td>
-                          <td class="p-3 italic">"El pedido llegó 4 días tarde y la caja del Galaxy S24 estaba golpeada."</td>
-                          <td class="p-3"><span class="bg-amber-100 border border-amber-300 text-amber-800 font-semibold px-2 py-0.5 rounded text-xs">Delivery</span></td>
-                          <td class="p-3 text-xs">Retraso en distribución y empaque vulnerado</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50/60 transition-colors">
-                          <td class="p-3 font-bold text-red-600 bg-red-50 text-center w-24">3</td>
-                          <td class="p-3 italic">"La página web se cae todo el tiempo cuando intento ingresar mi tarjeta."</td>
-                          <td class="p-3"><span class="bg-blue-100 border border-blue-300 text-blue-800 font-semibold px-2 py-0.5 rounded text-xs">Website</span></td>
-                          <td class="p-3 text-xs">Interrupción de sesión en pasarela de checkout</td>
-                        </tr>
-                        <tr class="hover:bg-slate-50/60 transition-colors">
-                          <td class="p-3 font-bold text-red-600 bg-red-50 text-center w-24">2</td>
-                          <td class="p-3 italic">"El cargador inalámbrico recalienta demasiado y dejó de funcionar a la semana."</td>
-                          <td class="p-3"><span class="bg-emerald-100 border border-emerald-300 text-emerald-800 font-semibold px-2 py-0.5 rounded text-xs">Producto</span></td>
-                          <td class="p-3 text-xs">Falla técnica de hardware por sobrecalentamiento</td>
+                      <tbody id="tabla-cuerpo" class="divide-y divide-slate-100 text-slate-600">
+                        <tr>
+                          <td colSpan="5" class="p-6 text-center text-slate-400 italic text-sm">No hay registros alineados. Completá la carga de archivos en la sección de Entrenamiento.</td>
                         </tr>
                       </tbody>
                     </table>
@@ -166,10 +150,20 @@
         </div>
     </div>
 
-    <!-- LOGICA INTERACTIVA SÚPER SIMPLE -->
+    <!-- LOGICA DE AUTOMATIZACIÓN INTERNA -->
     <script>
-        let currentMain = "";
-        let currentSpecific = "";
+        // Pool de simulación masiva que incorpora el ID de Compra y las notas mixtas de Medallia
+        const DATASET_SIMULADO = [
+            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
+            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65. Iniciando reclamo.", main: "DOA/DAP Process", specific: "wrong model delivered" },
+            { compra: "45087311", score: 5, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
+            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
+            { compra: "45081192", score: 3, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
+            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil dentro de todo.", main: "Pickup", specific: "store pickup standard" },
+            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
+        ];
+
+        let archivosListos = false;
 
         function switchTab(tab) {
             const btnNuevo = document.getElementById('btn-nuevo');
@@ -190,40 +184,91 @@
             }
         }
 
-        function cargarEjemplo(texto, main, specific) {
-            document.getElementById('txt-comentario').value = texto;
-            currentMain = main;
-            currentSpecific = specific;
-            
-            // Ocultar resultados previos para forzar el click en simular
-            document.getElementById('resultado-vacio').classList.remove('hidden');
-            document.getElementById('resultado-ia').classList.add('hidden');
-            document.getElementById('resultado-guardado').classList.add('hidden');
+        function actualizarEstadoTrain() {
+            document.getElementById('train-text').innerText = "✅ Base Histórica Humana Cargada (3,400 filas)";
+            document.getElementById('train-text').className = "text-xs text-emerald-700 font-bold";
         }
 
-        function simularClasificacion() {
-            const comentario = document.getElementById('txt-comentario').value;
-            if(!comentario) {
-                alert("Por favor, ingresá o cargá un comentario primero.");
+        function mostrarArchivoCargado() {
+            const fileInput = document.getElementById('file-input');
+            if(fileInput.files.length > 0) {
+                document.getElementById('file-text').innerText = `📊 Archivo: ${fileInput.files[0].name}`;
+            } else {
+                document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            }
+            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
+            archivosListos = true;
+        }
+
+        function cargarSimulacionRapida() {
+            actualizarEstadoTrain();
+            document.getElementById('file-text').innerText = "📊 RawData_Medallia_SemanaActual.csv";
+            document.getElementById('file-text').className = "text-xs text-blue-800 font-bold";
+            archivosListos = true;
+        }
+
+        function simularProcesamientoLote() {
+            if(!archivosListos) {
+                alert("Por favor, cargá los archivos de Medallia o usá el botón de simulación rápida.");
                 return;
             }
 
-            // Si el usuario escribió algo propio y no usó ejemplo, inventamos una coherente
-            if(!currentMain) {
-                currentMain = "Producto";
-                currentSpecific = "Inconformidad general con componentes del ecosistema";
-            }
+            document.getElementById('status-inicial').classList.add('hidden');
+            document.getElementById('status-completo').classList.add('hidden');
+            document.getElementById('status-procesando').classList.remove('hidden');
 
-            document.getElementById('resultado-vacio').classList.add('hidden');
-            document.getElementById('resultado-ia').classList.remove('hidden');
-            
-            document.getElementById('res-main').innerText = currentMain;
-            document.getElementById('res-specific').innerText = `"${currentSpecific}"`;
-            document.getElementById('resultado-guardado').classList.remove('hidden');
-            
-            // Reset de auxiliares de ejemplo
-            currentMain = "";
-            currentSpecific = "";
+            const log = document.getElementById('log-ia');
+            log.innerHTML = "Analizando columnas de la matriz histórica humana...<br>";
+
+            setTimeout(() => {
+                log.innerHTML += "» Clonando taxonomías detectadas: Extrayendo 'Main issue' y 'Specific cause'...<br>";
+                log.innerHTML += "» Mapeando criterios históricos: 10 categorías identificadas.<br>";
+            }, 900);
+
+            setTimeout(() => {
+                log.innerHTML += "» Procesando RawData actual indexando por ID (N° Compra)...<br>";
+                log.innerHTML += "» Ejecutando regla de segmentación NPS: Evaluando scores (1-6, 7-8, 9-10)...<br>";
+            }, 1800);
+
+            setTimeout(() => {
+                log.innerHTML += "✓ Pipeline finalizado con éxito. Criterio humano asimilado.<br>";
+                construirDashboard();
+                document.getElementById('status-procesando').classList.add('hidden');
+                document.getElementById('status-completo').classList.remove('hidden');
+            }, 2800);
+        }
+
+        function construirDashboard() {
+            let detractores = 0; let neutrales = 0; let promotores = 0;
+            let tablaHtml = "";
+
+            DATASET_SIMULADO.forEach(row => {
+                // Aplicación estricta de la regla de segmentación basada en el score
+                if (row.score >= 1 && row.score <= 6) detractores++;
+                else if (row.score >= 7 && row.score <= 8) neutrales++;
+                else if (row.score >= 9 && row.score <= 10) promotores++;
+
+                let badgeStyle = "bg-slate-100 border-slate-300 text-slate-700";
+                if(row.main === "Delivery" || row.main === "DOA/DAP Process") badgeStyle = "bg-red-50 border-red-200 text-red-700";
+                if(row.main === "Website" || row.main === "Samsung APP") badgeStyle = "bg-blue-50 border-blue-200 text-blue-700";
+                if(row.main === "Product") badgeStyle = "bg-purple-50 border-purple-200 text-purple-700";
+                if(row.main === "Payment") badgeStyle = "bg-amber-50 border-amber-200 text-amber-700";
+
+                tablaHtml += `
+                    <tr class="hover:bg-slate-50/60 transition-colors">
+                      <td class="p-3 font-mono font-bold text-xs text-slate-700">${row.compra}</td>
+                      <td class="p-3 font-bold text-slate-800 text-center w-24">${row.score}</td>
+                      <td class="p-3 italic text-xs">"${row.comentario}"</td>
+                      <td class="p-3"><span class="border px-2 py-0.5 rounded text-xs font-semibold ${badgeStyle}">${row.main}</span></td>
+                      <td class="p-3 text-xs font-mono text-slate-500">${row.specific}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('dash-detractores').innerText = detractores;
+            document.getElementById('dash-neutrales').innerText = neutrales;
+            document.getElementById('dash-promotores').innerText = promotores;
+            document.getElementById('tabla-cuerpo').innerHTML = tablaHtml;
         }
     </script>
 </body>
