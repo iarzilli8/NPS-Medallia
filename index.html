@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clasificador de Contactos NPS - Samsung</title>
-    <!-- Tailwind CSS desde CDN para diseño rápido y estético -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .tab-active { background-color: #1e40af; color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -14,7 +13,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-    <!-- BANNER PRINCIPAL (Estilo Corporativo Samsung) -->
     <div class="bg-blue-900 text-white p-8 pb-12 shadow-md">
         <div class="max-w-6xl mx-auto">
             <p class="text-xs font-mono uppercase tracking-widest opacity-60">Backoffice • Análisis de encuestas NPS masivas</p>
@@ -24,7 +22,6 @@
     </div>
 
     <div class="max-w-6xl mx-auto -mt-6 px-4 pb-12">
-        <!-- BOTONES DE NAVEGACIÓN (TABS) -->
         <div class="flex gap-2 mb-6">
             <button id="btn-nuevo" onclick="switchTab('nuevo')" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors tab-active">
                 Entrenamiento y Carga Masiva
@@ -34,12 +31,9 @@
             </button>
         </div>
 
-        <!-- ================= VISTA 1: ENTRENAMIENTO Y CARGA ================= -->
         <div id="vista-nuevo" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <!-- PANEL IZQUIERDO: SECCIÓN DE CARGA DE ARCHIVOS -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
                 
-                <!-- PASO 1: APRENDIZAJE POR MODELO HISTÓRICO -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">1. Matriz de Criterio General (Histórico Humano)</label>
@@ -52,7 +46,6 @@
                     </div>
                 </div>
 
-                <!-- PASO 2: CARGA DE REPORTE SEMANAL -->
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. RawData Actual de Medallia a Analizar</label>
                     <div class="border border-slate-300 rounded-lg p-4 text-center relative hover:bg-slate-50 transition-colors">
@@ -65,7 +58,6 @@
                     Clonará Criterio Humano y Procesar Lote
                 </button>
 
-                <!-- ACTIVADOR DE SIMULACIÓN RÁPIDA -->
                 <div class="pt-3 border-t border-slate-100 text-center">
                     <button onclick="cargarSimulacionRapida()" class="text-xs text-blue-800 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2 rounded-full font-medium transition-colors">
                         ⚡ Cargar simulación rápida de archivos (Inyectar MockData)
@@ -73,15 +65,10 @@
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: CONSOLA DE SIMULACIÓN IA -->
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm min-h-[360px] flex flex-col justify-between">
                 <div>
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">LOG DEL MODELO ADAPTATIVO</h3>
-                    
-                    <div id="status-inicial" class="text-sm text-slate-400 italic mt-8">
-                        Esperando la carga del archivo de criterios históricos evaluados por humanos para mapear la taxonomía de Samsung.
-                    </div>
-
+                    <div id="status-inicial" class="text-sm text-slate-400 italic mt-8">Esperando la carga del archivo de criterios históricos evaluados por humanos para mapear la taxonomía de Samsung.</div>
                     <div id="status-procesando" class="hidden space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-4 h-4 rounded-full border-2 border-blue-800 border-t-transparent animate-spin"></div>
@@ -89,7 +76,6 @@
                         </div>
                         <p id="log-ia" class="text-xs font-mono bg-slate-50 p-3 rounded border border-slate-200 text-slate-600 block max-h-44 overflow-y-auto whitespace-pre-line font-medium">Iniciando...</p>
                     </div>
-
                     <div id="status-completo" class="hidden space-y-3">
                         <div class="p-3 bg-emerald-50 rounded-lg text-emerald-800 text-xs flex flex-col gap-1 border border-emerald-100">
                             <span class="font-bold">✓ Criterio de Evaluación Clonado con Éxito</span>
@@ -98,31 +84,44 @@
                         <p class="text-xs text-slate-500">Métricas consolidadas listas en la pestaña <b>Dashboard</b>.</p>
                     </div>
                 </div>
-                <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-2 font-mono">
-                    Model state: Dynamic alignment with customer ID validation.
-                </div>
+                <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-2 font-mono">Model state: Dynamic alignment with customer ID validation.</div>
             </div>
         </div>
 
-        <!-- ================= VISTA 2: DASHBOARD ================= -->
         <div id="vista-dashboard" class="space-y-6 hidden">
-            <!-- CARDS DE MÉTRICAS SEGMENTADAS SEGÚN SCORE NPS -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-red-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Detractores (Notas 1 a 6)</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Cantidad de Detractores</span>
                     <span id="dash-detractores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
                 </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Neutrales (Notas 7 y 8)</span>
-                    <span id="dash-neutrales" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
-                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Promotores (Notas 9 y 10)</span>
-                    <span id="dash-promotores" class="text-3xl font-bold text-slate-800 mt-1 block">0</span>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-600">
+                    <span class="text-xs font-bold text-slate-400 uppercase block tracking-wider">Representación sobre el Total</span>
+                    <span id="dash-porcentaje" class="text-3xl font-bold text-blue-800 mt-1 block">0%</span>
                 </div>
             </div>
 
-            <!-- TABLA COMPILADA CON PARÁMETROS REALES -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">📋 Top 5 detractor cause (Rankeado por volumen)</h3>
+                    <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded font-mono">Muestra del lote actual</span>
+                </div>
+                <div class="p-2">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="p-3">Specific Cause</th>
+                                <th class="p-3 text-right w-32">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-motivos-cuerpo" class="divide-y divide-slate-100 font-mono text-xs text-slate-700">
+                            <tr>
+                                <td colSpan="2" class="p-4 text-center text-slate-400 italic">No hay registros procesados para computar el ranking.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                     <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Pivot Table & RawData - Trazabilidad por ID de Compra</h3>
@@ -150,17 +149,18 @@
         </div>
     </div>
 
-    <!-- LOGICA DE AUTOMATIZACIÓN INTERNA -->
     <script>
-        // Pool de simulación masiva que incorpora el ID de Compra y las notas mixtas de Medallia
+        // Dataset de prueba extendido para forzar un comportamiento y volumen real en el ranking
         const DATASET_SIMULADO = [
-            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "delay on delivery" },
-            { compra: "45088941", score: 1, comentario: "Me mandaron el televisor de 55 pulgadas pero yo pagué el de 65. Iniciando reclamo.", main: "DOA/DAP Process", specific: "wrong model delivered" },
-            { compra: "45087311", score: 5, comentario: "No figura ningún código de seguimiento en la página para rastrear mi Galaxy S24.", main: "Website", specific: "lack of tracking information" },
-            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción de lanzamiento y da error continuo.", main: "Payment", specific: "checkout gateway failure" },
-            { compra: "45081192", score: 3, comentario: "La batería del celular dura menos de medio día con uso básico. El hardware vino fallado.", main: "Product", specific: "battery degradation issue" },
-            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido y ágil dentro de todo.", main: "Pickup", specific: "store pickup standard" },
-            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima, el descuento extra se aplicó al instante.", main: "Samsung APP", specific: "seamless digital experience" }
+            { compra: "45088120", score: 2, comentario: "El camión de logística llegó 4 días tarde. Nadie me avisó de la reprogramación.", main: "Delivery", specific: "Delay on delivery" },
+            { compra: "45088121", score: 1, comentario: "El repartidor no encontró el domicilio y cancelaron mi envío del televisor sin avisar.", main: "Delivery", specific: "Delay on delivery" },
+            { compra: "45088122", score: 3, comentario: "Sigo esperando el despacho de las tablets que compré en el lanzamiento.", main: "Delivery", specific: "Delay on delivery" },
+            { compra: "45086550", score: 4, comentario: "Trato de ingresar mi tarjeta para las 6 cuotas de la promoción y da error continuo.", main: "Payment", specific: "Payment method issue" },
+            { compra: "45086551", score: 2, comentario: "La página rechaza el pago y me vació el carrito. Pésimo checkout.", main: "Payment", specific: "Payment method issue" },
+            { compra: "45087311", score: 5, comentario: "No carga la pantalla cuando pongo finalizar compra.", main: "Website", specific: "Website performance" },
+            { compra: "45081192", score: 3, comentario: "La batería del celular dura menos de medio día con uso básico.", main: "Product", specific: "Product malfunction" },
+            { compra: "45082210", score: 8, comentario: "Atención normal. El retiro por la sucursal física fue rápido.", main: "Pickup", specific: "store pickup standard" },
+            { compra: "45089901", score: 10, comentario: "La compra mediante la Samsung APP fue rapidísima.", main: "Samsung APP", specific: "seamless digital experience" }
         ];
 
         let archivosListos = false;
@@ -222,12 +222,12 @@
 
             setTimeout(() => {
                 log.innerHTML += "» Clonando taxonomías detectadas: Extrayendo 'Main issue' y 'Specific cause'...<br>";
-                log.innerHTML += "» Mapeando criterios históricos: 10 categorías identificadas.<br>";
+                log.innerHTML += "» Mapeando criterios históricos de Samsung...<br>";
             }, 900);
 
             setTimeout(() => {
                 log.innerHTML += "» Procesando RawData actual indexando por ID (N° Compra)...<br>";
-                log.innerHTML += "» Ejecutando regla de segmentación NPS: Evaluando scores (1-6, 7-8, 9-10)...<br>";
+                log.innerHTML += "» Ejecutando regla de segmentación NPS: Evaluando scores (1-6 para detractores)...<br>";
             }, 1800);
 
             setTimeout(() => {
@@ -239,14 +239,18 @@
         }
 
         function construirDashboard() {
-            let detractores = 0; let neutrales = 0; let promotores = 0;
+            let totalEncuestas = DATASET_SIMULADO.length;
+            let detractores = 0;
             let tablaHtml = "";
+            let conteoSpecifics = {};
 
             DATASET_SIMULADO.forEach(row => {
-                // Aplicación estricta de la regla de segmentación basada en el score
-                if (row.score >= 1 && row.score <= 6) detractores++;
-                else if (row.score >= 7 && row.score <= 8) neutrales++;
-                else if (row.score >= 9 && row.score <= 10) promotores++;
+                // Regla estricta: Notas 1 a 6 = Detractores
+                if (row.score >= 1 && row.score <= 6) {
+                    detractores++;
+                    // Agrupar causas específicas únicamente de detractores
+                    conteoSpecifics[row.specific] = (conteoSpecifics[row.specific] || 0) + 1;
+                }
 
                 let badgeStyle = "bg-slate-100 border-slate-300 text-slate-700";
                 if(row.main === "Delivery" || row.main === "DOA/DAP Process") badgeStyle = "bg-red-50 border-red-200 text-red-700";
@@ -265,9 +269,27 @@
                 `;
             });
 
+            // Calcular porcentaje real sobre el total
+            let porcentajeDetractores = ((detractores / totalEncuestas) * 100).toFixed(1);
+
+            // Ordenar causas específicas de mayor a menor (Top 5 de Pivot Table)
+            const rankingOrdenado = Object.entries(conteoSpecifics)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            let rankingHtml = "";
+            rankingOrdenado.forEach(([motivo, cantidad]) => {
+                rankingHtml += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-medium text-slate-700">${motivo}</td>
+                        <td class="p-3 text-right font-bold text-slate-900 w-32 pr-6">${cantidad}</td>
+                    </tr>
+                `;
+            });
+
             document.getElementById('dash-detractores').innerText = detractores;
-            document.getElementById('dash-neutrales').innerText = neutrales;
-            document.getElementById('dash-promotores').innerText = promotores;
+            document.getElementById('dash-porcentaje').innerText = `${porcentajeDetractores}%`;
+            document.getElementById('top-motivos-cuerpo').innerHTML = rankingHtml;
             document.getElementById('tabla-cuerpo').innerHTML = tablaHtml;
         }
     </script>
