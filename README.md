@@ -22,7 +22,7 @@ Este proyecto busca transferir el tiempo humano utilizado en confeccionar el rep
 
 ---
 
-## 🛠️ ¿Cómo se usa?
+##  ¿Cómo se usa?
 
 Al tratarse de un prototipo interactivo (Single Page App estructurada en HTML, JavaScript nativo), el flujo operativo se simula de manera local en el navegador del usuario en tres  pasos:
 
